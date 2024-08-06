@@ -32,8 +32,7 @@ node {
     withCredentials([file(credentialsId: JWT_KEY_CRED_ID, variable: 'jwt_key_file')]) {
         stage('Authorize org') {
 
-            list = command "${toolbelt}/sfdx force:org:list"
-            if (list != 0) { error 'list failed' }
+            
 
             if (isUnix()) {
                 rc = sh returnStatus: true, script: "${toolbelt} force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${HUB_ORG} --jwtkeyfile ${jwt_key_file} --setdefaultdevhubusername --instanceurl ${SFDC_HOST}"
@@ -43,6 +42,9 @@ node {
             if (rc != 0) { error 'hub org authorization failed' }
 
 			println rc
+
+            list = command "${toolbelt}/sfdx force:org:list"
+            if (list != 0) { error 'list failed' }
         }
 
         stage('Run tests') {
