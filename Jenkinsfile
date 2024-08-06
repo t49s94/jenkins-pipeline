@@ -5,6 +5,7 @@ node {
     def BUILD_NUMBER=env.BUILD_NUMBER
     def RUN_ARTIFACT_DIR="tests/${BUILD_NUMBER}"
     def SFDC_USERNAME
+    def TEST_LEVEL='RunLocalTests'
 
     def HUB_ORG=env.HUB_ORG_DH
     def SFDC_HOST = env.SFDC_HOST_DH
@@ -29,7 +30,7 @@ node {
     }
 
     withCredentials([file(credentialsId: JWT_KEY_CRED_ID, variable: 'jwt_key_file')]) {
-        stage('Deploye Code') {
+        stage('Authorize org') {
             if (isUnix()) {
                 rc = sh returnStatus: true, script: "${toolbelt} force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${HUB_ORG} --jwtkeyfile ${jwt_key_file} --setdefaultdevhubusername --instanceurl ${SFDC_HOST}"
             }else{
@@ -38,6 +39,16 @@ node {
             if (rc != 0) { error 'hub org authorization failed' }
 
 			println rc
+        }
+
+        stage('Run tests') {
+            rc = command "${toolbelt}/sfdx force:apex:test:run --username ${HUB_ORG} --wait 10 --resultformat tap --codecoverage --testlevel ${TEST_LEVEL}"
+                if (rc != 0) {
+                    error 'Salesforce unit test run in test scratch org failed.'
+                }
+        }
+
+        stage('Deploy code') {
 			
 			// need to pull out assigned username
 			if (isUnix()) {
