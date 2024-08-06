@@ -49,23 +49,16 @@ node {
 			// need to pull out assigned username
 			if (isUnix()) {
 				//rmsg = sh returnStdout: true, script: "${toolbelt} force:mdapi:deploy -d manifest/. -u ${HUB_ORG}"
-                rmsg = sh returnStdout: true, script: "${toolbelt} force:source:deploy --manifest manifest/package.xml -u ${HUB_ORG}"
+                rmsg = sh returnStdout: true, script: "${toolbelt} force:source:deploy --manifest manifest/package.xml -u ${HUB_ORG} --testlevel ${TEST_LEVEL}"
 			
 			}else{
 			   //rmsg = bat returnStdout: true, script: "\"${toolbelt}\" force:mdapi:deploy -d manifest/. -u ${HUB_ORG}"
-               rmsg = bat returnStdout: true, script: "\"${toolbelt}\" force:source:deploy --manifest manifest/package.xml -u ${HUB_ORG}"
+               rmsg = bat returnStdout: true, script: "\"${toolbelt}\" force:source:deploy --manifest manifest/package.xml -u ${HUB_ORG} --testlevel ${TEST_LEVEL}"
 			}
 			  
             printf rmsg
             println('Hello from a Job DSL script!')
             println(rmsg)
-        }
-
-        stage('Run tests') {
-            rc = command "${toolbelt}/sfdx force:apex:test:run --targetusername ${HUB_ORG} --wait 10 --resultformat tap --codecoverage --testlevel ${TEST_LEVEL}"
-                if (rc != 0) {
-                    error 'Salesforce unit test run in pacakge install scratch org failed.'
-                }
         }
     }
 }
