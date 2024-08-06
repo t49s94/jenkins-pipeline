@@ -13,3 +13,7 @@ package.xml
 #**/tsconfig.json
 
 #**/*.ts
+
+**/tsconfig.json
+
+**/*.ts
