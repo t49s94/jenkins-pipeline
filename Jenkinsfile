@@ -44,7 +44,7 @@ node {
         stage('Run tests') {
             rc = command "${toolbelt}/sfdx force:apex:test:run --targetusername ${HUB_ORG} --wait 10 --resultformat tap --codecoverage --testlevel ${TEST_LEVEL}"
                 if (rc != 0) {
-                    error 'Salesforce unit test run in test scratch org failed.'
+                    error "${rc}"
                 }
         }
 
