@@ -42,16 +42,6 @@ node {
             if (rc != 0) { error 'hub org authorization failed' }
 
 			println rc
-
-            list = command "${toolbelt}/sfdx force:org:list"
-            if (list != 0) { error 'list failed' }
-        }
-
-        stage('Run tests') {
-            rc = command "${toolbelt}/sfdx force:apex:test:run --targetusername ${HUB_ORG} --wait 10 --resultformat tap --codecoverage --testlevel ${TEST_LEVEL}"
-                if (rc != 0) {
-                    error "${rc}"
-                }
         }
 
         stage('Deploy code') {
@@ -69,6 +59,13 @@ node {
             printf rmsg
             println('Hello from a Job DSL script!')
             println(rmsg)
+        }
+
+        stage('Run tests') {
+            rc = command "${toolbelt}/sfdx force:apex:test:run --targetusername ${HUB_ORG} --wait 10 --resultformat tap --codecoverage --testlevel ${TEST_LEVEL}"
+                if (rc != 0) {
+                    error 'Salesforce unit test run in pacakge install scratch org failed.'
+                }
         }
     }
 }
